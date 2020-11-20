@@ -3,4 +3,4 @@
 3. Directors and producers are just stored as long strings
 
 
-![Alt text](http://github.com/masondarcy/4312Project/diagrams/img.jpg?raw=true "Title")
+![video rental db](http://github.com/masondarcy/4312Project/diagrams/videorental_er_diagram.png?raw=true "Title")
