@@ -4,5 +4,6 @@
 
 updated videotape to be weak on Movie*
 
+note: add address, phone number for customer
 
 ![video rental db](https://github.com/MasonDarcy/4312Project/blob/master/diagrams/videorental_ER_diagram.png?raw=true "Title")
