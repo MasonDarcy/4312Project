@@ -24,16 +24,7 @@ return "?";
 //TODO
 }
 	
-	
-//Add a rating for a movie, ratings are uniquely identified by the videoID and the critic name	
-public void addRating(String criticName, String ratingText, int videoID) throws SQLException {
-//TODO
-}	
-	
-//Given a videoID, return a list of all ratings with their critics names and the rating text
-public void getRatings(int videoID) throws SQLException{
-//TODO		
-}	
+		
 
 /*MANAGER related functions.-----------*/
 public void removeVideo(int videoID) throws SQLException {
@@ -47,6 +38,16 @@ public void addVideo(String title, int year, String description, String director
 //Could have several of these for each attribute	
 public void updateVideo() throws SQLException {
 //TODO	
+}
+	
+//Add a rating for a movie, ratings are uniquely identified by the videoID and the critic name	
+public void addRating(String criticName, String ratingText, int videoID) throws SQLException {
+//TODO
+}	
+	
+//Given a videoID, return a list of all ratings with their critics names and the rating text
+public void getRatings(int videoID) throws SQLException{
+//TODO		
 }	
 /*-------------------------------------*/	
 	
