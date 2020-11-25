@@ -12,7 +12,7 @@ private String databaseURL = "jdbc:mysql://rds-mysql-eecs4312-smartshopper.csh5f
 private String dbUserName = "admin";
 private String dbPassword = "Netherthistle1";
 
-/*Schema will probably change.*/
+
 public void retrieveVideoInformationByName(String title, int year) throws SQLException {
 	
 }
