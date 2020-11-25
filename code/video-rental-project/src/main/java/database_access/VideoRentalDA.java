@@ -35,6 +35,17 @@ public void getRatings(int videoID) throws SQLException{
 //TODO		
 }	
 
+/*MANAGER related functions.-----------*/
+public void removeVideo(int videoID) throws SQLException {
+//TODO	
+}
+
+public void addVideo(String title, int year, String description, String directors, String producers) throws SQLException {
+//TODO	
+}
+/*-------------------------------------*/	
+	
+	
 /*Untested*/
 public void addManager(String email, String password) throws SQLException {
 	try (
