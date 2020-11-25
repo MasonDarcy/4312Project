@@ -17,6 +17,10 @@ public String retrieveVideoInformationByName(String name) throws SQLException {
 return "?";
 }
 
+//Add a rating for a movie, ratings are uniquely identified by the videoID and the critic name	
+public void addRating(String criticName, String ratingText, int videoID) throws SQLException {
+
+}	
 
 /*Untested*/
 public void addManager(String email, String password) throws SQLException {
