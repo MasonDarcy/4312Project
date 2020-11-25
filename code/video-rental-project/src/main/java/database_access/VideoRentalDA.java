@@ -12,8 +12,8 @@ private String databaseURL = "jdbc:mysql://rds-mysql-eecs4312-smartshopper.csh5f
 private String dbUserName = "admin";
 private String dbPassword = "Netherthistle1";
 
-
-public void retrieveVideoInformationByName(String title, int year) throws SQLException {
+//Currently movies are uniquely identified by an int videoID
+public void retrieveVideoInformationByName(int videoID) throws SQLException {
 	
 }
 
