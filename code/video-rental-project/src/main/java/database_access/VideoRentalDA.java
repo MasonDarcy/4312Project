@@ -17,6 +17,12 @@ public String retrieveVideoInformationByName(String name) throws SQLException {
 return "?";
 }
 
+//Returns all movies in a given category for the main menu, example: drama
+public String retrieveAllVideosInCategory(String cat) throws SQLException {
+return "?";
+}
+	
+	
 //Add a rating for a movie, ratings are uniquely identified by the videoID and the critic name	
 public void addRating(String criticName, String ratingText, int videoID) throws SQLException {
 
