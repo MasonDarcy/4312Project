@@ -15,23 +15,24 @@ private String dbPassword = "Netherthistle1";
 //Currently movies are uniquely identified by an int videoID. So there could be multiple movies with the same name, so this should return a collection of movies.
 public String retrieveVideoInformationByName(String name) throws SQLException {
 return "?";
+//TODO
 }
 
 //Returns all movies in a given category for the main menu, example: drama
 public String retrieveAllVideosInCategory(String cat) throws SQLException {
 return "?";
+//TODO
 }
 	
 	
 //Add a rating for a movie, ratings are uniquely identified by the videoID and the critic name	
 public void addRating(String criticName, String ratingText, int videoID) throws SQLException {
-
+//TODO
 }	
 	
 //Given a videoID, return a list of all ratings with their critics names and the rating text
 public void getRatings(int videoID) throws SQLException{
-	
-	
+//TODO		
 }	
 
 /*Untested*/
