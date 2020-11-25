@@ -54,7 +54,13 @@ public void getRatings(int videoID) throws SQLException{
 public void getToBeOrderedList() throws SQLException {
 //TODO
 }
-	
+
+//Need to update an order status from unpaid to paid, paid to delivered, etc
+//could be multiple functions, may be dependent on the GUI
+public void updateOrderStatus(int orderID) throws SQLException {
+//TODO		
+}
+
 /*-------------------------------------*/	
 	
 	
