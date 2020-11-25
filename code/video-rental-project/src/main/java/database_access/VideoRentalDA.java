@@ -43,6 +43,11 @@ public void removeVideo(int videoID) throws SQLException {
 public void addVideo(String title, int year, String description, String directors, String producers) throws SQLException {
 //TODO	
 }
+
+//Could have several of these for each attribute	
+public void updateVideo() throws SQLException {
+//TODO	
+}	
 /*-------------------------------------*/	
 	
 	
