@@ -64,7 +64,7 @@ public void addManager(String email, String password) throws SQLException {
 }
 }
 
-/*Adds a new customer to the system.*/
+/*Account creation related functions-------------------------------------------------------------------------------------------------------------.*/
 public void addCustomer(String email, String password) throws SQLException {
 	try (
 	         Connection conn = DriverManager.getConnection(
@@ -136,7 +136,7 @@ public boolean managerExists(String email) throws SQLException {
 	
 }
 
-
+/*------------------------------------------------------------------------s-----------------------------------------------------------------------.*/
 
 }
 
