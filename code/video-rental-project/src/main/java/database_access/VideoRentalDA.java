@@ -49,6 +49,12 @@ public void addRating(String criticName, String ratingText, int videoID) throws 
 public void getRatings(int videoID) throws SQLException{
 //TODO		
 }	
+	
+//Scan through all current orders that are paid for. Retrieve the list of all orderItems from those orders, because they need to be shipped.
+public void getToBeOrderedList() throws SQLException {
+//TODO
+}
+	
 /*-------------------------------------*/	
 	
 	
