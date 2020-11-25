@@ -13,8 +13,8 @@ private String dbUserName = "admin";
 private String dbPassword = "Netherthistle1";
 
 //Currently movies are uniquely identified by an int videoID
-public void retrieveVideoInformationByName(int videoID) throws SQLException {
-	
+public String retrieveVideoInformationByName(int videoID) throws SQLException {
+return "?";
 }
 
 
