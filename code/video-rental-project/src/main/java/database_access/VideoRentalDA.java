@@ -21,6 +21,12 @@ return "?";
 public void addRating(String criticName, String ratingText, int videoID) throws SQLException {
 
 }	
+	
+//Given a videoID, return a list of all ratings with their critics names and the rating text
+public void getRatings(int videoID) throws SQLException{
+	
+	
+}	
 
 /*Untested*/
 public void addManager(String email, String password) throws SQLException {
