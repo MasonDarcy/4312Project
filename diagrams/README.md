@@ -11,4 +11,4 @@ note: add address, phone number for customer
 
 alternative idea: Remove videotape as an entity, and just keep track of movies by adding a "stock" attribute for movies that we decrement and increment.
 
-![video rental db](https://github.com/MasonDarcy/4312Project/blob/master/diagrams/videorental_ER_diagram.png (2)?raw=true "Title")
+![video rental db](https://github.com/MasonDarcy/4312Project/blob/master/diagrams/videorental_ER_diagram.png\ (2)?raw=true "Title")
