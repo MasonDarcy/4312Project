@@ -12,8 +12,8 @@ private String databaseURL = "jdbc:mysql://rds-mysql-eecs4312-smartshopper.csh5f
 private String dbUserName = "admin";
 private String dbPassword = "Netherthistle1";
 
-//Currently movies are uniquely identified by an int videoID
-public String retrieveVideoInformationByName(int videoID) throws SQLException {
+//Currently movies are uniquely identified by an int videoID. So there could be multiple movies with the same name, so this should return a collection of movies.
+public String retrieveVideoInformationByName(String name) throws SQLException {
 return "?";
 }
 
