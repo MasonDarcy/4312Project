@@ -17,6 +17,12 @@ public String retrieveVideoInformationByName(String name) throws SQLException {
 return "?";
 //TODO
 }
+	
+//Retrieve information about a video by its ID
+public String retrieveVideoInformationByID(int videoID) throws SQLException {
+return "?";
+//TODO
+}	
 
 //Returns all movies in a given category for the main menu, example: drama
 public String retrieveAllVideosInCategory(String cat) throws SQLException {
