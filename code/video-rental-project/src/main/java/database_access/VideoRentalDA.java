@@ -30,8 +30,27 @@ return "?";
 //TODO
 }
 	
-		
+//Create a new order
+public void createOrder() throws SQLException  {
+//TODO	
+}
 
+//Removes an order (must remove all existing orderItems corresponding to the order as well)
+public void removeOrder() throws SQLException {
+//TODO	
+}
+
+//Creates a new orderItem with respect to an existing order
+public void addOrderItem() throws SQLException {
+//TODO	
+}
+
+//Removes an existing orderItem
+public void removeOrderItem() throws SQLException {
+//TODO	
+}
+	
+	
 /*MANAGER related functions.-----------*/
 public void removeVideo(int videoID) throws SQLException {
 //TODO	
