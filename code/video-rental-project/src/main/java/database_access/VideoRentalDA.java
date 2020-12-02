@@ -6,7 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
 import data_objects.OrderItem;
+import data_objects.Movie;
+import data_objects.Rating;
+import data_objects.CustomerOrder;
 
 public class VideoRentalDA {
 
@@ -15,20 +19,20 @@ private String dbUserName = "admin";
 private String dbPassword = "Netherthistle1";
 
 //Currently movies are uniquely identified by an int videoID. So there could be multiple movies with the same name, so this should return a collection of movies.
-public String retrieveVideoInformationByName(String name) throws SQLException {
-return "?";
+public ArrayList<Movie> retrieveVideoInformationByName(String name) throws SQLException {
+return new ArrayList<Movie>();
 //TODO
 }
 	
 //Retrieve information about a video by its ID
-public String retrieveVideoInformationByID(int videoID) throws SQLException {
-return "?";
+public Movie retrieveVideoInformationByID(int videoID) throws SQLException {
+return null;
 //TODO
 }	
 
 //Returns all movies in a given category for the main menu, example: drama
-public String retrieveAllVideosInCategory(String cat) throws SQLException {
-return "?";
+public ArrayList<Movie> retrieveAllVideosInCategory(String cat) throws SQLException {
+return null;
 //TODO
 }
 	
@@ -41,6 +45,20 @@ public void createOrder() throws SQLException  {
 public void removeOrder() throws SQLException {
 //TODO	
 }
+
+//Given a customer email, return all of their orders	
+public ArrayList<CustomerOrder> getOrders(String email) throws SQLException {
+	return null;
+	//TODO
+}
+
+//Given an orderID return the order information
+public CustomerOrder getOrder(int orderID) throws SQLException {
+//TODO
+return null;
+}
+
+	
 
 //Creates a new orderItem with respect to an existing order
 public void addOrderItem() throws SQLException {
@@ -73,8 +91,9 @@ public void addRating(String criticName, String ratingText, int videoID) throws 
 }	
 	
 //Given a videoID, return a list of all ratings with their critics names and the rating text
-public void getRatings(int videoID) throws SQLException{
-//TODO		
+public ArrayList<Rating> getRatings(int videoID) throws SQLException{
+//TODO	
+return null;
 }	
 	
 //Returns an arraylist of OrderItem objects, whose order is PAID and are ready to be delivered.
