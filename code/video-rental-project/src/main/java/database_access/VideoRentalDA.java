@@ -133,7 +133,19 @@ public void createOrder() throws SQLException  {
 
 //Removes an order (must remove all existing orderItems corresponding to the order as well)
 public void removeOrder() throws SQLException {
-//TODO	
+try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+		String strSelect = "delete from orderItems WHERE orderID = " + orderID + ";";
+		stmt.executeUpdate(strSelect);
+		strSelect = "delete from customerOrders WHERE orderID = " + orderID + ";";
+		stmt.executeUpdate(strSelect);
+		conn.close();
+	}
 }
 
 //Given a customer email, return all of their orders	
