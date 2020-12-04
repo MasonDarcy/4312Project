@@ -19,10 +19,31 @@ private String dbUserName = "admin";
 private String dbPassword = "Netherthistle1";
 
 //Currently movies are uniquely identified by an int videoID. So there could be multiple movies with the same name, so this should return a collection of movies.
-public ArrayList<Movie> retrieveVideoInformationByName(String name) throws SQLException {
-return new ArrayList<Movie>();
-//TODO
+public ArrayList<Movie> getMoviesByTitle(String name) throws SQLException {
+ArrayList<Movie> output = new ArrayList<Movie>();
+	try (
+	        Connection conn = DriverManager.getConnection(
+	              databaseURL,
+	              dbUserName, dbPassword);  
+	        Statement stmt = conn.createStatement();
+	)  {
+		String strSelect = "select * from movies where title = " + "\'" + name + "\';";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	    	 int videoID = rset.getInt("videoID");
+	    	 int year = rset.getInt("year");
+	    	 String category = rset.getString("cat");
+	    	 String introduction = rset.getString("introduction");
+	    	 String directors = rset.getString("directors");
+	    	 String producers = rset.getString("producers");
+	    	 int stock = rset.getInt("stock"); 	
+	    	 output.add(new Movie(videoID, year, name, category, introduction, directors, producers, stock));
+	     }
+		 conn.close();
+	}
+return output;
 }
+	
 	
 //Retrieve information about a video by its ID
 public Movie retrieveVideoInformationByID(int videoID) throws SQLException {
