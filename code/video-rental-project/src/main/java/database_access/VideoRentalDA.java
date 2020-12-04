@@ -115,7 +115,20 @@ return output;
 	
 //Create a new order
 public void createOrder() throws SQLException  {
-//TODO	
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+		String date = "\"" + LocalDate.now().toString() +"\"";
+		String strSelect = "insert into customerOrders (dateOrdered, shippingDestination, period, status, email) values ( " + date + ", \"" + shippingDestination + "\", \"" + period + "\", \"UNPAID\", \'" + email + "\');";
+		stmt.executeUpdate(strSelect);
+	      
+	        conn.close();
+	    
+}
 }
 
 //Removes an order (must remove all existing orderItems corresponding to the order as well)
