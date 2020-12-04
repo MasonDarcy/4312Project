@@ -80,9 +80,37 @@ return output;
 }	
 
 //Returns all movies in a given category for the main menu, example: drama
-public ArrayList<Movie> retrieveAllVideosInCategory(String cat) throws SQLException {
-return null;
-//TODO
+public ArrayList<Movie> getMoviesByCat(String cat) throws SQLException {
+	ArrayList<Movie> output = new ArrayList<Movie>();
+	try (
+	        Connection conn = DriverManager.getConnection(
+	              databaseURL,
+	              dbUserName, dbPassword);  
+
+	        Statement stmt = conn.createStatement();
+	)  {
+		String strSelect = "select * from movies where cat = " + "\'" + cat + "\';";
+
+		ResultSet rset = stmt.executeQuery(strSelect);
+		
+	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	       
+	    	 String title = rset.getString("title");
+	    	 int videoID = rset.getInt("videoID");
+	    	 int year = rset.getInt("year");
+	    
+	    	 String introduction = rset.getString("introduction");
+	    	 String directors = rset.getString("directors");
+	    	 String producers = rset.getString("producers");
+	    	 int stock = rset.getInt("stock");
+	    	 	
+	    	 output.add(new Movie(videoID, year, title, cat, introduction, directors, producers, stock));
+	     }
+	     
+	     conn.close();
+	}
+	
+return output;
 }
 	
 //Create a new order
