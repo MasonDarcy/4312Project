@@ -5,12 +5,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
-import data_objects.OrderItem;
-import data_objects.Movie;
-import data_objects.Rating;
 import data_objects.CustomerOrder;
+import data_objects.Movie;
+import data_objects.OrderItem;
+import data_objects.Rating;
 
 public class VideoRentalDA {
 
@@ -25,28 +26,35 @@ ArrayList<Movie> output = new ArrayList<Movie>();
 	        Connection conn = DriverManager.getConnection(
 	              databaseURL,
 	              dbUserName, dbPassword);  
+
 	        Statement stmt = conn.createStatement();
 	)  {
 		String strSelect = "select * from movies where title = " + "\'" + name + "\';";
+
 		ResultSet rset = stmt.executeQuery(strSelect);
+		
 	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	       
 	    	 int videoID = rset.getInt("videoID");
 	    	 int year = rset.getInt("year");
 	    	 String category = rset.getString("cat");
 	    	 String introduction = rset.getString("introduction");
 	    	 String directors = rset.getString("directors");
 	    	 String producers = rset.getString("producers");
-	    	 int stock = rset.getInt("stock"); 	
+	    	 int stock = rset.getInt("stock");
+	    	 	
 	    	 output.add(new Movie(videoID, year, name, category, introduction, directors, producers, stock));
 	     }
-		 conn.close();
+	     
+	     conn.close();
 	}
+	
 return output;
+
 }
 	
-	
 //Retrieve information about a video by its ID
-public Movie getMovieByID(int videoID) throws SQLException {
+public Movie retrieveVideoInformationByID(int videoID) throws SQLException {
 	Movie output = null;
 	try (
 	        Connection conn = DriverManager.getConnection(
@@ -69,7 +77,7 @@ public Movie getMovieByID(int videoID) throws SQLException {
 	    	 String producers = rset.getString("producers");
 	    	 int stock = rset.getInt("stock");
 	    	 	
-	    	 output = new Movie(videoID, year, title, category, introduction, directors, producers, stock));
+	    	 output = new Movie(videoID, year, title, category, introduction, directors, producers, stock);
 	     }
 	     
 	     conn.close();
@@ -80,7 +88,7 @@ return output;
 }	
 
 //Returns all movies in a given category for the main menu, example: drama
-public ArrayList<Movie> getMoviesByCat(String cat) throws SQLException {
+public ArrayList<Movie> retrieveMoviesByCat(String cat) throws SQLException {
 	ArrayList<Movie> output = new ArrayList<Movie>();
 	try (
 	        Connection conn = DriverManager.getConnection(
@@ -112,9 +120,38 @@ public ArrayList<Movie> getMoviesByCat(String cat) throws SQLException {
 	
 return output;
 }
+
+//Checks if a customer has an unpaid order, implicitely this order is open, so we can add order items to it
+public int hasUnpaidOrder(String email) throws SQLException {
+	int output = 0;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
 	
+		String strSelect = "select orderID from customerOrders WHERE email = " + "\"" + email + "\" AND status = \"UNPAID\"" + ";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	        int rowCount = 0;
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	           output = rset.getInt("orderID");
+	           
+	        }
+	        conn.close();
+	       
+	        	
+	        }
+	return output;
+}
+
+
+
+
+
 //Create a new order
-public void createOrder() throws SQLException  {
+public void createCustomerOrder(String email) throws SQLException  {
 	try (
 	         Connection conn = DriverManager.getConnection(
 	               databaseURL,
@@ -123,17 +160,43 @@ public void createOrder() throws SQLException  {
 	         Statement stmt = conn.createStatement();
 	)  {
 		String date = "\"" + LocalDate.now().toString() +"\"";
-		String strSelect = "insert into customerOrders (dateOrdered, shippingDestination, period, status, email) values ( " + date + ", \"" + shippingDestination + "\", \"" + period + "\", \"UNPAID\", \'" + email + "\');";
+		String strSelect = "insert into customerOrders (dateOrdered, status, email) values ( " + date + ", \"UNPAID\", \'" + email + "\');";
 		stmt.executeUpdate(strSelect);
 	      
 	        conn.close();
 	    
 }
+	
 }
 
+public boolean movieAlreadyExistsOnUnpaidOrder(int orderID, int videoID) {
+	
+//	try (
+//	        Connection conn = DriverManager.getConnection(
+//	              databaseURL,
+//	              dbUserName, dbPassword);  
+//
+//	        Statement stmt = conn.createStatement();
+//	)  {
+//
+//		String strSelect = "select * from orderItems WHERE orderID = " + orderID + " AND videoID = " + videoID ;
+//		ResultSet rset = stmt.executeQuery(strSelect);
+//		 int rowCount = 0;
+//	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+//	        
+//	       
+//	      
+//	        ++rowCount;
+//	     }
+//	     
+//	       conn.close();
+	return true;
+}
+
+
 //Removes an order (must remove all existing orderItems corresponding to the order as well)
-public void removeOrder() throws SQLException {
-try (
+public void removeOrder(int orderID) throws SQLException {
+	try (
 	         Connection conn = DriverManager.getConnection(
 	               databaseURL,
 	               dbUserName, dbPassword);  
@@ -146,25 +209,36 @@ try (
 		stmt.executeUpdate(strSelect);
 		conn.close();
 	}
+	
 }
 
-//Given a customer email, return all of their orders	
 public ArrayList<CustomerOrder> getOrders(String email) throws SQLException {
 	return null;
 	//TODO
 }
 
-//Given an orderID return the order information
 public CustomerOrder getOrder(int orderID) throws SQLException {
-//TODO
-return null;
+	//TODO
+	return null;
 }
 
-	
-
 //Creates a new orderItem with respect to an existing order
-public void addOrderItem() throws SQLException {
-//TODO	
+public void addOrderItem(int orderID, int videoID, int quantity, int period) throws SQLException {
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+	
+		String strSelect = "insert into orderItems(orderID, videoID, quantity, period) values (" + orderID + ", " + videoID + ", " + quantity + ", " + period + ");";
+		//System.out.println(strSelect);
+		stmt.executeUpdate(strSelect);
+	      
+	        conn.close();
+	    
+}
 }
 
 //Removes an existing orderItem
@@ -195,8 +269,9 @@ public void addRating(String criticName, String ratingText, int videoID) throws 
 //Given a videoID, return a list of all ratings with their critics names and the rating text
 public ArrayList<Rating> getRatings(int videoID) throws SQLException{
 //TODO	
-return null;
+	return null;
 }	
+	
 
 public ArrayList<OrderItem> getCurrentOrderItemsByEmail(String email) throws SQLException {
 	
@@ -210,7 +285,7 @@ public ArrayList<OrderItem> getCurrentOrderItemsByEmail(String email) throws SQL
 	        Statement stmt = conn.createStatement();
 	)  {
 
-		String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.videoID, orderItems.orderID, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID WHERE customerOrders.email = \"" + email + "\" AND customerOrders.status = \"UNPAID\";";
+		String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.period, orderItems.videoID, orderItems.orderID, customerOrders.period, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID WHERE customerOrders.email = \"" + email + "\" AND customerOrders.status = \"UNPAID\";";
 		ResultSet rset = stmt.executeQuery(strSelect);
 		 int rowCount = 0;
 	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
@@ -219,26 +294,36 @@ public ArrayList<OrderItem> getCurrentOrderItemsByEmail(String email) throws SQL
 	        int year = rset.getInt("year");
 	        String title = rset.getString("title");
 	        int quantity = rset.getInt("quantity");
+	        int period = rset.getInt("period");
 	        
-	        output.add(new OrderItem(title, year, quantity, orderID, videoID, email));
+	        output.add(new OrderItem(title, year, quantity, orderID, videoID, period, email));
+	      
 	        ++rowCount;
 	     }
-	       conn.close();  
+	     
+	       conn.close();
+	   
 	}
+
 	return output;
 }
-	
-	
-//Returns an arraylist of OrderItem objects, whose order is PAID and are ready to be delivered.
+
+
+
+//Scan through all current orders that are paid for. Retrieve the list of all orderItems from those orders, because they need to be shipped.
 public ArrayList<OrderItem> getToBeOrderedList() throws SQLException {
+
 ArrayList<OrderItem> output = new ArrayList<OrderItem>();
+
 try (
         Connection conn = DriverManager.getConnection(
               databaseURL,
               dbUserName, dbPassword);  
+
         Statement stmt = conn.createStatement();
 )  {
-	String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.videoID, orderItems.orderID, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID;";
+
+	String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.period, orderItems.videoID, orderItems.orderID, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID;";
 	ResultSet rset = stmt.executeQuery(strSelect);
 	 int rowCount = 0;
      while(rset.next()) {   // Move the cursor to the next row, return false if no more row
@@ -248,21 +333,45 @@ try (
         int year = rset.getInt("year");
         String title = rset.getString("title");
         int quantity = rset.getInt("quantity");
-        output.add(new OrderItem(title, year, quantity, orderID, videoID, email));
+        int period = rset.getInt("period");
+        output.add(new OrderItem(title, year, quantity, orderID, videoID, period, email));
+      
         ++rowCount;
      }
-       conn.close();  
+     
+       conn.close();
+   
 }
+
+
+
 return output;
 }
 
 //Need to update an order status from unpaid to paid, paid to delivered, etc
 //could be multiple functions, may be dependent on the GUI
 public void updateOrderStatus(int orderID) throws SQLException {
-//TODO		
+//TODO
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+	
+		String strSelect = "update customerOrders set status = \"PAID\" where orderID = " + orderID + ";";
+		stmt.executeUpdate(strSelect);
+	      
+	        conn.close();
+	    
+}
+	
+	
+	
 }
 
-/*-------------------------------------*/	
+/*---------------------------------------------------------------------------------------------*/	
 	
 	
 /*Untested*/
@@ -359,6 +468,4 @@ public boolean managerExists(String email) throws SQLException {
 
 }
 
-
-	
 
