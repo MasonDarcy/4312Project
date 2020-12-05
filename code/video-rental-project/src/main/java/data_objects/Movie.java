@@ -50,4 +50,15 @@ private String introduction;
 private String directors;
 private String producers;
 private int stock;
+
+@Override
+public String toString() {
+	return "Movie [videoID=" + videoID + ", year=" + year + ", title=" + title + ", category=" + category
+			+ ", introduction=" + introduction + ", directors=" + directors + ", producers=" + producers + ", stock="
+			+ stock + "]";
+}
+
+
+
+
 }
