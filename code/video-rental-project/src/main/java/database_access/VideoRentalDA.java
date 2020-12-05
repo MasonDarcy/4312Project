@@ -197,6 +197,37 @@ public ArrayList<Rating> getRatings(int videoID) throws SQLException{
 //TODO	
 return null;
 }	
+
+public ArrayList<OrderItem> getCurrentOrderItemsByEmail(String email) throws SQLException {
+	
+	ArrayList<OrderItem> output = new ArrayList<OrderItem>();
+
+	try (
+	        Connection conn = DriverManager.getConnection(
+	              databaseURL,
+	              dbUserName, dbPassword);  
+
+	        Statement stmt = conn.createStatement();
+	)  {
+
+		String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.videoID, orderItems.orderID, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID WHERE customerOrders.email = \"" + email + "\" AND customerOrders.status = \"UNPAID\";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+		 int rowCount = 0;
+	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	        int orderID = rset.getInt("orderID");
+	        int videoID = rset.getInt("videoID");
+	        int year = rset.getInt("year");
+	        String title = rset.getString("title");
+	        int quantity = rset.getInt("quantity");
+	        
+	        output.add(new OrderItem(title, year, quantity, orderID, videoID, email));
+	        ++rowCount;
+	     }
+	       conn.close();  
+	}
+	return output;
+}
+	
 	
 //Returns an arraylist of OrderItem objects, whose order is PAID and are ready to be delivered.
 public ArrayList<OrderItem> getToBeOrderedList() throws SQLException {
