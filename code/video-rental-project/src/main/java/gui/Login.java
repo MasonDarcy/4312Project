@@ -69,6 +69,9 @@ public class Login  {
     private JTextField editAttributeHolder;
     private JTextField editValueHolder;
     private JTextField searchHolder;
+    private JTextField addressField;
+    private JTextField phoneField;
+    private double cost;
     
     public void addComponentToPane(Container pane) {
   
@@ -160,6 +163,11 @@ public class Login  {
         final JLabel successLabel = new JLabel("");
         successLabel.setBounds(606, 149, 107, 16);
         loginCard.add(successLabel);
+        
+        final JLabel loginError = new JLabel("");
+        loginError.setFont(new Font("Dialog", Font.BOLD, 18));
+        loginError.setBounds(165, 220, 368, 33);
+        loginCard.add(loginError);
         
         
         
@@ -382,11 +390,11 @@ public class Login  {
         
         JButton payButton = new JButton("Pay / Order");
       
-        payButton.setBounds(626, 240, 98, 26);
+        payButton.setBounds(626, 351, 98, 26);
         orderCard.add(payButton);
         
         JLabel useLoyaltyLabel = new JLabel("Use Loyalty");
-        useLoyaltyLabel.setBounds(626, 184, 88, 16);
+        useLoyaltyLabel.setBounds(626, 274, 88, 16);
         orderCard.add(useLoyaltyLabel);
         
         JButton backFromOrderButton = new JButton("Back");
@@ -423,11 +431,11 @@ public class Login  {
         
        
         JRadioButton loyaltyYesRadioBtn = new JRadioButton("yes");
-        loyaltyYesRadioBtn.setBounds(700, 180, 121, 24);
+        loyaltyYesRadioBtn.setBounds(700, 270, 121, 24);
         orderCard.add(loyaltyYesRadioBtn);
         
         JRadioButton loyaltyNoRadioBtn = new JRadioButton("no");
-        loyaltyNoRadioBtn.setBounds(700, 208, 121, 24);
+        loyaltyNoRadioBtn.setBounds(700, 298, 121, 24);
         orderCard.add(loyaltyNoRadioBtn);
         
         
@@ -475,6 +483,28 @@ public class Login  {
         lblOtherOrders.setFont(new Font("Dialog", Font.BOLD, 18));
         lblOtherOrders.setBounds(95, 266, 186, 16);
         orderCard.add(lblOtherOrders);
+        
+        JLabel lblAddress = new JLabel("Address:");
+        lblAddress.setBounds(626, 194, 55, 16);
+        orderCard.add(lblAddress);
+        
+        addressField = new JTextField();
+        addressField.setBounds(700, 192, 114, 20);
+        orderCard.add(addressField);
+        addressField.setColumns(10);
+        
+        JLabel lblPhone = new JLabel("Phone #:");
+        lblPhone.setBounds(626, 233, 55, 16);
+        orderCard.add(lblPhone);
+        
+        phoneField = new JTextField();
+        phoneField.setBounds(700, 231, 114, 20);
+        orderCard.add(phoneField);
+        phoneField.setColumns(10);
+        
+        final JLabel orderError = new JLabel("");
+        orderError.setBounds(626, 420, 241, 46);
+        orderCard.add(orderError);
         
         JPanel individualOrderCard = new JPanel();
         cards.add(individualOrderCard, ORDERINFOCARD);
@@ -771,7 +801,7 @@ public class Login  {
         			boolean customerExists = dba.customerExists(newEmail);
 					boolean managerExists = dba.managerExists(newEmail);
 					
-					if(!customerExists && !managerExists) {
+					if((!customerExists && !managerExists) && !newPasswordField.getText().isEmpty()) {
 						if(isManager) {
 							System.out.println(1);
 							dba.addManager(newEmail, newPassword);
@@ -784,9 +814,13 @@ public class Login  {
 					//	ArrayList<Movie> list = dba.retrieveMoviesByCat("Horror");
 					//	populateCategory(list, horrorPanel, titleHolder, introductionHolder, yearHolder, categoryHolder, directorHolder, producerHolder, stockHolder);
 						
-					successLabel.setText("Account created.");
+				
 						
 						
+					} else if(newPasswordField.getText().isEmpty()) {
+						loginError.setText("Error, enter a password.");
+					} else {
+						loginError.setText("Error, account exists.");
 					}
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -799,9 +833,25 @@ public class Login  {
         payButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		try {
+        			if(phoneField.getText().isEmpty()) {
+        				orderError.setText("Error: Enter phone#");
+        			} else if (addressField.getText().isEmpty()) {
+        				orderError.setText("Error: Enter adddress");
+        			} else if (creditCardField.getText().isEmpty()) {
+        				orderError.setText("Error: Enter payment info");
+        			} else {
 					int orderID = dba.hasUnpaidOrder(email);
-					dba.updateOrderStatus(orderID);
 					
+					dba.updateOrderStatus(orderID);
+				
+					if(loyalty) {
+						int loyalty = dba.getLoyalty(email);
+						cost -= (loyalty / 1000);
+						dba.setZeroLoyalty(email);
+					}
+					dba.updateLoyalty(email, cost);
+					orderError.setText("Success: you paid " + cost);
+        			}
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -865,6 +915,7 @@ public class Login  {
         		//Given an order, calculate the late fees, and erase it AMAAN doing this
         		//Then nuke the order from reality
         		try {
+        			
 					dba.removeOrder(orderID);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -883,34 +934,60 @@ public class Login  {
  			int quantity = Integer.parseInt(quantityField.getText());
  			int period = tier;
  			
- 						try {
- 						
- 							int orderID = dba.hasUnpaidOrder(email);
- 							
- 							if(!dba.movieAlreadyExistsOnUnpaidOrder(orderID, videoID)) {
- 								System.out.println(1);
- 								addedStatusLabel.setText("orderItem already on order.");
+ 			if(quantityField.getText().isEmpty()) {
+ 			addedStatusLabel.setText("Error: Missing Quantity");
+ 			} else
+				try {
+					if(!dba.enoughStock(videoID, quantity)) {
+						addedStatusLabel.setText("Error: Lower Quantity");
+					} else {
+								try {
+									int quant = Integer.parseInt(quantityField.getText());
+									int orderID = dba.hasUnpaidOrder(email);
+									int numPeriod = dba.getNumPeriod(orderID, period);
+									System.out.println(numPeriod);
+									
+									int numItems = dba.getNumItems(orderID);
+									System.out.println(numItems);
+									boolean wrongPeriod = numPeriod != numItems;
+									
+									if(!dba.movieAlreadyExistsOnUnpaidOrder(orderID, videoID)) {
+										System.out.println(1);
+										addedStatusLabel.setText("orderItem already on order.");
 
- 							} else if(orderID > 0) {
- 								dba.addOrderItem(orderID, videoID, quantity, period); 
- 								System.out.println(2);
- 								addedStatusLabel.setText("orderItem added.");
- 							} else {
- 								//If there are no open orders, it created ones
- 								System.out.println(3);
- 								System.out.println(email + "?");
- 								dba.createCustomerOrder(email);
- 								System.out.println(4);
- 								int nOrderID = dba.hasUnpaidOrder(email);
- 								System.out.println(5);
- 								dba.addOrderItem(nOrderID, videoID, quantity, period); 
- 								addedStatusLabel.setText("orderItem added");
- 							}
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
- 						
+									} else if (wrongPeriod) {
+										
+										addedStatusLabel.setText("Invalid period.");
+
+									} else if(orderID > 0) {
+										
+										dba.updateStock(videoID, quantity);
+										dba.addOrderItem(orderID, videoID, quantity, period); 
+										System.out.println(1);
+
+										addedStatusLabel.setText("orderItem added.");
+									} else {
+										//If there are no open orders, it created ones
+										System.out.println(2);
+										System.out.println(email + "?");
+										dba.createCustomerOrder(email);
+										System.out.println(4);
+										int nOrderID = dba.hasUnpaidOrder(email);
+										System.out.println(5);
+										dba.updateStock(videoID, quantity);
+										dba.addOrderItem(nOrderID, videoID, quantity, period); 
+										addedStatusLabel.setText("orderItem added");
+									}
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+					}
+				} catch (NumberFormatException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
  			}
          });
         
@@ -969,17 +1046,22 @@ public class Login  {
     			@Override
     			public void actionPerformed(ActionEvent arg0) {
     				String field = emailField.getText();
+    				String password = passwordField.getText();
     				try {
     					
-						if(dba.customerExists(field)) {
+						if(dba.customerExists(field) && dba.correctCustomerPassword(field, password)) {
 							
 							ArrayList<Movie> list = dba.retrieveMoviesByCat("Horror");
 							populateCategory(list, horrorPanel, titleHolder, introductionHolder, yearHolder, categoryHolder, directorHolder, producerHolder, stockHolder);
 							email = emailField.getText();
 							goToGallery();
 							
-						} else if (dba.managerExists(field)) {
+						} else if (dba.managerExists(field) && dba.correctManagerPassword(field, password)) {
 							goToManager();
+						} else {
+							
+							loginError.setText("Error, incorrect email or password.");
+							
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -988,6 +1070,9 @@ public class Login  {
             });
         
     }
+    
+    
+    
      
 //    public void itemStateChanged(ItemEvent evt) {
 //        CardLayout cl = (CardLayout)(cards.getLayout());
@@ -1075,7 +1160,8 @@ private void populateOrderItems(final ArrayList<OrderItem> list, JPanel horrorPa
 				JLabel n = new JLabel(buttonText);
 				horrorPanel.add(n);
 		}
-					
+		
+		cost = price + 15.0;
 		costLabel.setText("Cost with $15.00 shipping: $" + (price + 15.0));
 		
 

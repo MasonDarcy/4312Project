@@ -160,6 +160,7 @@ public void createCustomerOrder(String email) throws SQLException  {
 		String strSelect = "insert into customerOrders (dateOrdered, status, email) values ( \'" + date + "\', \"UNPAID\", \'" + email + "\');";
 		stmt.executeUpdate(strSelect);
 	      
+		
 	        conn.close();
 	    
 }
@@ -264,6 +265,115 @@ public void addOrderItem(int orderID, int videoID, int quantity, int period) thr
 }
 }
 
+public int getStock(int videoID) throws SQLException{
+	
+	int stock = 0;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "select stock from movies where videoID = " + videoID + ";";
+		//System.out.println(strSelect);
+		stmt.executeQuery(strSelect);
+		ResultSet rset = stmt.executeQuery(strSelect);
+		 while(rset.next()) { 
+		stock = rset.getInt("stock");
+	      
+		 }
+	        conn.close();
+	}
+	
+	return stock;
+	
+}
+
+public int getLoyalty(String email) throws SQLException {
+	int points = 0;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "select loyaltyPoints from customers WHERE email = \"" + email + "\";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	       
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	        	
+	           points = rset.getInt("loyaltyPoints");
+	        }
+	        conn.close();  
+}
+	
+	return points;
+}
+public void setZeroLoyalty(String email) throws SQLException {
+	
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "update customers SET loyaltyPoints = " + 0 + " where email = \"" + email + "\";"; 
+		stmt.executeUpdate(strSelect);
+	       
+	   
+	        conn.close();  
+}
+	
+}
+public int updateLoyalty(String email, double dollars) throws SQLException {
+	int points = (int)((dollars * 100) + getLoyalty(email));
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "update customers SET loyaltyPoints = " + points + " where email = \"" + email + "\";"; 
+		stmt.executeUpdate(strSelect);
+	       
+	   
+	        conn.close();  
+}
+	
+	return points;
+}
+
+public void updateStock(int videoID, int quant) throws SQLException{
+	int stockToBe = getStock(videoID) - quant;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+	
+		String strSelect = "update movies set stock = " + stockToBe + " WHERE videoID = " + videoID + ";";
+		
+		stmt.executeUpdate(strSelect);
+	      
+	        conn.close();
+	
+	}
+}
+
 //Removes an existing orderItem
 public void removeOrderItem() throws SQLException {
 //TODO	
@@ -273,10 +383,22 @@ public void removeOrderItem() throws SQLException {
 
 /*MANAGER related functions.-----------*/
 public void removeVideo(int videoID) throws SQLException {
-//TODO	
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+	
+		String strSelect = "DELETE from movies where videoID = " + videoID + ";";
+		stmt.executeUpdate(strSelect);
+	      
+	        conn.close();
+	}	
 }
 
-public void addVideo(String title, int year, String description, String directors, String producers) throws SQLException {
+public void addVideo(String title, int year, String introduction, String directors, String producers, int stock) throws SQLException {
 //TODO	
 }
 
@@ -330,6 +452,8 @@ public ArrayList<OrderItem> getOrderItemsByOrderID(int orderID) throws SQLExcept
 
 	return output;
 }
+
+
 
 public ArrayList<OrderItem> getCurrentOrderItemsByEmail(String email) throws SQLException {
 	
@@ -517,6 +641,136 @@ public boolean customerExists(String email) throws SQLException {
 }
 	return false;
 }
+
+public boolean correctCustomerPassword(String email, String password) throws SQLException {
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+	
+		String strSelect = "select email from customers WHERE email = " + "\"" + email + "\" AND password = \"" + password + "\";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	        int rowCount = 0;
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	           String fetchedEmail = rset.getString("email");
+	           System.out.println(fetchedEmail);
+	           ++rowCount;
+	        }
+	        conn.close();
+	        if(rowCount > 0) {
+	        	return true;
+	        }
+}
+	return false;
+	
+}
+
+public boolean correctManagerPassword(String email, String password) throws SQLException {
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+	)  {
+	
+		String strSelect = "select email from managers WHERE email = " + "\"" + email + "\" AND password = \"" + password + "\";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	        int rowCount = 0;
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	           String fetchedEmail = rset.getString("email");
+	           System.out.println(fetchedEmail);
+	           ++rowCount;
+	        }
+	        conn.close();
+	        if(rowCount > 0) {
+	        	return true;
+	        }
+}
+	return false;
+	
+}
+
+public int getNumPeriod(int orderID, int period) throws SQLException {
+	
+	int rowCount = 0;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "select * from orderItems WHERE orderID = " + orderID + " AND period = " + period + ";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	       
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	      
+	           ++rowCount;
+	        }
+	        conn.close();  
+}
+	return rowCount;
+}
+
+public boolean enoughStock(int videoID, int quantity) throws SQLException {
+	int quant = 0;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "select stock from movies WHERE videoID = " + videoID + ";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	       
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	      
+	        	quant = rset.getInt("stock");
+	           
+	        }
+	        conn.close();  
+}
+	if(quantity > quant) {
+		return false;
+	} else {
+		return true;
+	}
+
+}
+public int getNumItems(int orderID) throws SQLException {
+	
+	int rowCount = 0;
+	try (
+	         Connection conn = DriverManager.getConnection(
+	               databaseURL,
+	               dbUserName, dbPassword);  
+	 
+	         Statement stmt = conn.createStatement();
+			
+	)  {
+	
+		String strSelect = "select * from orderItems WHERE orderID = " + orderID + ";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+	       
+	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	      
+	           ++rowCount;
+	        }
+	        conn.close();  
+}
+	return rowCount;
+}
+
+
 
 /*Untested. Given an e-mail, returns true if the manager already exists. For use in the GUI controller in rejecting duplicate account creation. */
 public boolean managerExists(String email) throws SQLException {
