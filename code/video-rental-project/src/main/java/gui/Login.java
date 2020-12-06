@@ -3,14 +3,24 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
 
+import data_objects.CustomerOrder;
 import data_objects.Movie;
 import data_objects.OrderItem;
 import database_access.VideoRentalDA;
 import javax.swing.border.SoftBevelBorder;
+
+import com.google.protobuf.Duration;
+import com.google.protobuf.TextFormat.ParseException;
+import java.time.temporal.ChronoUnit;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.EtchedBorder;
@@ -21,11 +31,18 @@ public class Login  {
     final static String TEXTPANEL = "Card with JTextField";
     final static String MOVIEVIEW = "Card with movie info and add cart";
     final static String ORDERVIEW = "Card with order information";
+    final static String ORDERINFOCARD = "Card with individual order information";
+    final static String SHIPPINGCARD = "Card with shipping functionalities";
+    final static String UPDATECARD = "Card with video update functionalities";
     private JTextField emailField;
     private JTextField passwordField;
     private VideoRentalDA dba = new VideoRentalDA(); 
     private int iterator = 0;
     private ArrayList<JButton> buttons = new ArrayList<JButton>();
+    private ArrayList<JButton> orderButtons = new ArrayList<JButton>();
+    private ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
+    private ArrayList<CustomerOrder> customerOrders = new ArrayList<CustomerOrder>();
+
     private ArrayList<Movie> horrorList = null;
     private JTextField searchField;
     private String email;
@@ -37,6 +54,21 @@ public class Login  {
     private int  videoID = 0;
     private int orderID = 0;
     private JTextField quantityField;
+    private JTextField newEmailField;
+    private JTextField newPasswordField;
+    private boolean isManager = false;
+    private JTextField orderIDHolder;
+    private JTextField addTitleHolder;
+    private JTextField addYearHolder;
+    private JTextField addIntroductionHolder;
+    private JTextField addDirectorsHolder;
+    private JTextField addProducersHolder;
+    private JTextField addStockHolder;
+    private JTextField removeVideoHolder;
+    private JTextField editVideoIDHolder;
+    private JTextField editAttributeHolder;
+    private JTextField editValueHolder;
+    private JTextField searchHolder;
     
     public void addComponentToPane(Container pane) {
   
@@ -79,8 +111,55 @@ public class Login  {
         passwordField.setColumns(10);
         
         JLabel titleLabel = new JLabel("Video Rental Service");
-        titleLabel.setBounds(85, 25, 160, 20);
+        titleLabel.setBounds(12, 12, 160, 20);
         loginCard.add(titleLabel);
+        
+        JLabel lblLogin = new JLabel("Login");
+        lblLogin.setBounds(204, 57, 55, 16);
+        loginCard.add(lblLogin);
+        
+        JLabel lblNewLabel = new JLabel("Create Account");
+        lblNewLabel.setBounds(461, 57, 100, 16);
+        loginCard.add(lblNewLabel);
+        
+        JLabel lblNewLabel_1 = new JLabel("Enter Email:");
+        lblNewLabel_1.setBounds(374, 82, 76, 16);
+        loginCard.add(lblNewLabel_1);
+        
+        newEmailField = new JTextField();
+        newEmailField.setBounds(461, 80, 114, 20);
+        loginCard.add(newEmailField);
+        newEmailField.setColumns(10);
+        
+        newPasswordField = new JTextField();
+        newPasswordField.setBounds(461, 112, 114, 20);
+        loginCard.add(newPasswordField);
+        newPasswordField.setColumns(10);
+        
+        JLabel lblNewLabel_2 = new JLabel("Password:");
+        lblNewLabel_2.setBounds(374, 114, 66, 16);
+        loginCard.add(lblNewLabel_2);
+        
+        JButton createAccountButton = new JButton("create account");
+      
+        createAccountButton.setBounds(461, 144, 127, 26);
+        loginCard.add(createAccountButton);
+        
+        final JRadioButton managerRadioButton = new JRadioButton("Manager");
+        managerRadioButton.setBounds(601, 78, 121, 24);
+        loginCard.add(managerRadioButton);
+        
+        managerRadioButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        	if(managerRadioButton.isSelected()) {
+        		isManager = true;
+        	}
+        	}
+        });
+        
+        final JLabel successLabel = new JLabel("");
+        successLabel.setBounds(606, 149, 107, 16);
+        loginCard.add(successLabel);
         
         
         
@@ -244,7 +323,7 @@ public class Login  {
         stockLabel.setFont(new Font("Dialog", Font.BOLD, 18));
         attributePanel.add(stockLabel);
         
-        JPanel orderPanel = new JPanel();
+        final JPanel orderPanel = new JPanel();
         orderPanel.setBounds(583, 101, 130, 157);
         movieCard.add(orderPanel);
         orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
@@ -320,7 +399,7 @@ public class Login  {
         orderScroll.setBounds(95, 294, 420, 151);
         orderCard.add(orderScroll);
         
-        JPanel customerOrderPanel = new JPanel();
+        final JPanel customerOrderPanel = new JPanel();
         orderScroll.setViewportView(customerOrderPanel);
         customerOrderPanel.setLayout(new BoxLayout(customerOrderPanel, BoxLayout.Y_AXIS));
         
@@ -392,11 +471,336 @@ public class Login  {
         label.setBounds(626, 302, 55, 16);
         orderCard.add(label);
         
+        JLabel lblOtherOrders = new JLabel("Other Orders");
+        lblOtherOrders.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblOtherOrders.setBounds(95, 266, 186, 16);
+        orderCard.add(lblOtherOrders);
+        
+        JPanel individualOrderCard = new JPanel();
+        cards.add(individualOrderCard, ORDERINFOCARD);
+        individualOrderCard.setLayout(null);
+        
+        JScrollPane individualScrollPane = new JScrollPane();
+        individualScrollPane.setBounds(60, 166, 337, 145);
+        individualOrderCard.add(individualScrollPane);
+        
+        final JPanel individualOrderItemsPanel = new JPanel();
+        individualScrollPane.setViewportView(individualOrderItemsPanel);
+        individualOrderItemsPanel.setLayout(new BoxLayout(individualOrderItemsPanel, BoxLayout.Y_AXIS));
+        
+        JLabel lblOrderitems = new JLabel("OrderItems");
+        lblOrderitems.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblOrderitems.setBounds(60, 130, 133, 24);
+        individualOrderCard.add(lblOrderitems);
+        
+        JLabel lblOrder = new JLabel("Order");
+        lblOrder.setFont(new Font("Dialog", Font.BOLD, 22));
+        lblOrder.setBounds(12, 9, 83, 24);
+        individualOrderCard.add(lblOrder);
+        
+        JButton backToOrderButton = new JButton("Back");
+       
+        backToOrderButton.setBounds(781, 12, 98, 26);
+        individualOrderCard.add(backToOrderButton);
+        
+        JButton returnOrderButton = new JButton("Return Order");
+     
+        returnOrderButton.setBounds(60, 341, 153, 26);
+        individualOrderCard.add(returnOrderButton);
+        
+        JLabel returnOutputLabel = new JLabel("");
+        returnOutputLabel.setBounds(266, 346, 131, 16);
+        individualOrderCard.add(returnOutputLabel);
+        
+        JPanel shippingCard = new JPanel();
+        cards.add(shippingCard, SHIPPINGCARD);
+        shippingCard.setLayout(null);
+        
+        JButton btnGetOrders = new JButton("Get orders");
+       
+        btnGetOrders.setBounds(110, 447, 98, 26);
+        shippingCard.add(btnGetOrders);
+        
+        JLabel lblGetOrders = new JLabel("Shipping List");
+        lblGetOrders.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblGetOrders.setBounds(110, 81, 129, 26);
+        shippingCard.add(lblGetOrders);
+        
+        JLabel lblNewLabel_3 = new JLabel("Update To Delivered");
+        lblNewLabel_3.setBounds(471, 122, 121, 26);
+        shippingCard.add(lblNewLabel_3);
+        
+        orderIDHolder = new JTextField();
+        orderIDHolder.setBounds(592, 125, 114, 20);
+        shippingCard.add(orderIDHolder);
+        orderIDHolder.setColumns(10);
+        
+        JButton shipOrderButton = new JButton("Submit");
+      
+        shipOrderButton.setBounds(592, 160, 98, 26);
+        shippingCard.add(shipOrderButton);
+        
+        JButton goToVideoUpdate = new JButton("update videos");
+       
+        goToVideoUpdate.setBounds(764, 12, 129, 26);
+        shippingCard.add(goToVideoUpdate);
+        
+        JScrollPane shippingScroll = new JScrollPane();
+        shippingScroll.setBounds(110, 143, 273, 278);
+        shippingCard.add(shippingScroll);
+        
+        final JPanel shippingPanel = new JPanel();
+        shippingScroll.setViewportView(shippingPanel);
+        
+        JPanel updateMovieCard = new JPanel();
+        cards.add(updateMovieCard, UPDATECARD);
+        updateMovieCard.setLayout(null);
+        
+        JScrollPane movieScroll = new JScrollPane();
+        movieScroll.setBounds(623, 103, 259, 348);
+        updateMovieCard.add(movieScroll);
+        
+        JPanel moviePanel = new JPanel();
+        movieScroll.setViewportView(moviePanel);
+        moviePanel.setLayout(new BoxLayout(moviePanel, BoxLayout.Y_AXIS));
+        
+        JLabel lblAddVideo = new JLabel("Add Video");
+        lblAddVideo.setFont(new Font("Dialog", Font.BOLD, 14));
+        lblAddVideo.setBounds(108, 51, 99, 16);
+        updateMovieCard.add(lblAddVideo);
+        
+        JLabel lblStock = new JLabel("Stock");
+        lblStock.setBounds(45, 274, 44, 21);
+        updateMovieCard.add(lblStock);
+        lblStock.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        JLabel lblProducers = new JLabel("Producers");
+        lblProducers.setBounds(45, 241, 80, 21);
+        updateMovieCard.add(lblProducers);
+        lblProducers.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        JLabel lblDirectors = new JLabel("Directors");
+        lblDirectors.setBounds(45, 208, 70, 21);
+        updateMovieCard.add(lblDirectors);
+        lblDirectors.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        JLabel lblIntroduction = new JLabel("Introduction");
+        lblIntroduction.setBounds(45, 169, 93, 21);
+        updateMovieCard.add(lblIntroduction);
+        lblIntroduction.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        JLabel lblYear = new JLabel("Year");
+        lblYear.setBounds(45, 136, 34, 21);
+        updateMovieCard.add(lblYear);
+        lblYear.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        JLabel lblTitle = new JLabel("Title");
+        lblTitle.setBounds(45, 103, 32, 21);
+        updateMovieCard.add(lblTitle);
+        lblTitle.setFont(new Font("Dialog", Font.BOLD, 16));
+        
+        addTitleHolder = new JTextField();
+        addTitleHolder.setBounds(162, 103, 114, 20);
+        updateMovieCard.add(addTitleHolder);
+        addTitleHolder.setColumns(10);
+        
+        addYearHolder = new JTextField();
+        addYearHolder.setBounds(162, 138, 114, 20);
+        updateMovieCard.add(addYearHolder);
+        addYearHolder.setColumns(10);
+        
+        addIntroductionHolder = new JTextField();
+        addIntroductionHolder.setBounds(162, 171, 114, 20);
+        updateMovieCard.add(addIntroductionHolder);
+        addIntroductionHolder.setColumns(10);
+        
+        addDirectorsHolder = new JTextField();
+        addDirectorsHolder.setBounds(162, 210, 114, 20);
+        updateMovieCard.add(addDirectorsHolder);
+        addDirectorsHolder.setColumns(10);
+        
+        addProducersHolder = new JTextField();
+        addProducersHolder.setBounds(162, 243, 114, 20);
+        updateMovieCard.add(addProducersHolder);
+        addProducersHolder.setColumns(10);
+        
+        addStockHolder = new JTextField();
+        addStockHolder.setBounds(162, 276, 114, 20);
+        updateMovieCard.add(addStockHolder);
+        addStockHolder.setColumns(10);
+        
+        JButton addVideoButton = new JButton("Submit");
+        addVideoButton.setBounds(162, 317, 98, 26);
+        updateMovieCard.add(addVideoButton);
+        
+        JLabel lblRemoveVideo = new JLabel("Remove Video");
+        lblRemoveVideo.setFont(new Font("Dialog", Font.BOLD, 14));
+        lblRemoveVideo.setBounds(117, 381, 114, 16);
+        updateMovieCard.add(lblRemoveVideo);
+        
+        JLabel lblVideoid = new JLabel("videoID");
+        lblVideoid.setFont(new Font("Dialog", Font.BOLD, 16));
+        lblVideoid.setBounds(45, 423, 80, 16);
+        updateMovieCard.add(lblVideoid);
+        
+        removeVideoHolder = new JTextField();
+        removeVideoHolder.setBounds(162, 421, 114, 20);
+        updateMovieCard.add(removeVideoHolder);
+        removeVideoHolder.setColumns(10);
+        
+        JButton removeVideoButton = new JButton("Submit");
+        removeVideoButton.setBounds(162, 452, 98, 26);
+        updateMovieCard.add(removeVideoButton);
+        
+        JLabel lblEditVideo = new JLabel("Edit Video");
+        lblEditVideo.setFont(new Font("Dialog", Font.BOLD, 14));
+        lblEditVideo.setBounds(394, 52, 93, 16);
+        updateMovieCard.add(lblEditVideo);
+        
+        JLabel lblNewLabel_4 = new JLabel("videoID");
+        lblNewLabel_4.setFont(new Font("Dialog", Font.BOLD, 16));
+        lblNewLabel_4.setBounds(358, 103, 80, 16);
+        updateMovieCard.add(lblNewLabel_4);
+        
+        editVideoIDHolder = new JTextField();
+        editVideoIDHolder.setBounds(424, 103, 114, 20);
+        updateMovieCard.add(editVideoIDHolder);
+        editVideoIDHolder.setColumns(10);
+        
+        JLabel lblAttribute = new JLabel("Attribute");
+        lblAttribute.setFont(new Font("Dialog", Font.BOLD, 16));
+        lblAttribute.setBounds(358, 153, 80, 16);
+        updateMovieCard.add(lblAttribute);
+        
+        editAttributeHolder = new JTextField();
+        editAttributeHolder.setBounds(424, 152, 114, 20);
+        updateMovieCard.add(editAttributeHolder);
+        editAttributeHolder.setColumns(10);
+        
+        JLabel lblValue = new JLabel("Value");
+        lblValue.setFont(new Font("Dialog", Font.BOLD, 16));
+        lblValue.setBounds(358, 212, 55, 16);
+        updateMovieCard.add(lblValue);
+        
+        editValueHolder = new JTextField();
+        editValueHolder.setBounds(424, 210, 114, 20);
+        updateMovieCard.add(editValueHolder);
+        editValueHolder.setColumns(10);
+        
+        JButton editVideoSubmitButton = new JButton("Submit");
+        editVideoSubmitButton.setBounds(424, 255, 98, 26);
+        updateMovieCard.add(editVideoSubmitButton);
+        
+        JButton toShippingButton = new JButton("To Shipping");
+    
+        toShippingButton.setBounds(768, 12, 114, 26);
+        updateMovieCard.add(toShippingButton);
+        
+        JButton managerVideoSearchButton = new JButton("Search");
+        managerVideoSearchButton.setBounds(749, 72, 98, 26);
+        updateMovieCard.add(managerVideoSearchButton);
+        
+        searchHolder = new JTextField();
+        searchHolder.setBounds(623, 75, 114, 20);
+        updateMovieCard.add(searchHolder);
+        searchHolder.setColumns(10);
+        
+        btnGetOrders.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		try {
+					ArrayList<OrderItem> list = dba.getToBeOrderedList();
+					shippingPanel.removeAll();
+					shippingPanel.repaint();
+					for(int i = 0; i < list.size(); i++) {
+						
+						String lt = "" + list.get(i).getOrderID();
+						lt += ", " + list.get(i).getTitle();
+						lt += ", " + list.get(i).getYear();
+						lt += ", " + list.get(i).getVideoID();
+						lt += ", " + list.get(i).getQuantity();
+						
+						JLabel n = new JLabel(lt);
+						shippingPanel.add(n);
+						shippingPanel.setVisible(false);
+						shippingPanel.setVisible(true);
+						System.out.println(lt);
+						
+					}
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        });
+        
+        goToVideoUpdate.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        	goToVideoUpdate();	
+        	}
+        });
+        
+        toShippingButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		goToManager();
+        	}
+        });
+        
+        shipOrderButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		//Given an orderID, set its status to SHIPPED
+        		
+        		
+        		try {
+        			String id = orderIDHolder.getText();
+					dba.updateOrderStatusShipped(Integer.parseInt(id));
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        });
+        
+        createAccountButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		String newEmail = newEmailField.getText();
+        		String newPassword = newPasswordField.getText();
+        		email = newEmailField.getText();
+        		
+        		try {
+        			boolean customerExists = dba.customerExists(newEmail);
+					boolean managerExists = dba.managerExists(newEmail);
+					
+					if(!customerExists && !managerExists) {
+						if(isManager) {
+							System.out.println(1);
+							dba.addManager(newEmail, newPassword);
+							System.out.println(1);
+
+						} else {
+							
+							dba.addCustomer(newEmail, newPassword);
+						}
+					//	ArrayList<Movie> list = dba.retrieveMoviesByCat("Horror");
+					//	populateCategory(list, horrorPanel, titleHolder, introductionHolder, yearHolder, categoryHolder, directorHolder, producerHolder, stockHolder);
+						
+					successLabel.setText("Account created.");
+						
+						
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+  
+        	}
+        });
         
         payButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		try {
 					int orderID = dba.hasUnpaidOrder(email);
+					dba.updateOrderStatus(orderID);
 					
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -412,7 +816,10 @@ public class Login  {
         		
 					try {
 					ArrayList<OrderItem> list = dba.getCurrentOrderItemsByEmail(email);
+					ArrayList<CustomerOrder> orderList = dba.getOrders(email);
 					populateOrderItems(list, orderItemPanel, costLabel);
+					
+				  populateCustomerOrders(orderList, customerOrderPanel, individualOrderItemsPanel, dba);
         			
 					 CardLayout cl = (CardLayout)(cards.getLayout());
 					 cl.show(cards, ORDERVIEW);		
@@ -422,6 +829,47 @@ public class Login  {
 				}
 				
         		
+        		
+        		
+        	}
+        });
+        
+        backToOrderButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		
+        		
+        		
+				try {
+				ArrayList<OrderItem> list = dba.getCurrentOrderItemsByEmail(email);
+				ArrayList<CustomerOrder> orderList = dba.getOrders(email);
+				populateOrderItems(list, orderItemPanel, costLabel);
+				
+			  populateCustomerOrders(orderList, customerOrderPanel, individualOrderItemsPanel, dba);
+    			
+				 CardLayout cl = (CardLayout)(cards.getLayout());
+				 cl.show(cards, ORDERVIEW);		
+				} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+    		
+    		
+    		
+    	}
+        });
+        
+        returnOrderButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		//TODO
+        		//Given an order, calculate the late fees, and erase it AMAAN doing this
+        		//Then nuke the order from reality
+        		try {
+					dba.removeOrder(orderID);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
         		
         		
         	}
@@ -440,17 +888,22 @@ public class Login  {
  							int orderID = dba.hasUnpaidOrder(email);
  							
  							if(!dba.movieAlreadyExistsOnUnpaidOrder(orderID, videoID)) {
- 								
+ 								System.out.println(1);
  								addedStatusLabel.setText("orderItem already on order.");
 
  							} else if(orderID > 0) {
  								dba.addOrderItem(orderID, videoID, quantity, period); 
+ 								System.out.println(2);
  								addedStatusLabel.setText("orderItem added.");
  							} else {
  								//If there are no open orders, it created ones
+ 								System.out.println(3);
+ 								System.out.println(email + "?");
  								dba.createCustomerOrder(email);
+ 								System.out.println(4);
  								int nOrderID = dba.hasUnpaidOrder(email);
- 								dba.addOrderItem(orderID, videoID, quantity, period); 
+ 								System.out.println(5);
+ 								dba.addOrderItem(nOrderID, videoID, quantity, period); 
  								addedStatusLabel.setText("orderItem added");
  							}
 						} catch (SQLException e) {
@@ -517,13 +970,16 @@ public class Login  {
     			public void actionPerformed(ActionEvent arg0) {
     				String field = emailField.getText();
     				try {
+    					
 						if(dba.customerExists(field)) {
+							
 							ArrayList<Movie> list = dba.retrieveMoviesByCat("Horror");
 							populateCategory(list, horrorPanel, titleHolder, introductionHolder, yearHolder, categoryHolder, directorHolder, producerHolder, stockHolder);
 							email = emailField.getText();
 							goToGallery();
-
-
+							
+						} else if (dba.managerExists(field)) {
+							goToManager();
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -543,7 +999,15 @@ public class Login  {
 		 cl.show(cards, TEXTPANEL);
     }
     
+   private void goToManager() {
+	   CardLayout cl = (CardLayout)(cards.getLayout());
+		 cl.show(cards, SHIPPINGCARD);
+   }
    
+   private void goToVideoUpdate() {
+	   CardLayout cl = (CardLayout)(cards.getLayout());
+		 cl.show(cards, UPDATECARD);
+   }
     
     private void populateCategory(final ArrayList<Movie> list, JPanel horrorPanel, final JLabel titleHolder, final JLabel introductionHolder, final JLabel yearHolder, final JLabel categoryHolder, final JLabel directorHolder, final JLabel producerHolder, final JLabel stockHolder) throws SQLException {
     	
@@ -617,7 +1081,95 @@ private void populateOrderItems(final ArrayList<OrderItem> list, JPanel horrorPa
 
 		}
     
-    
+private void populateCustomerOrders(ArrayList<CustomerOrder> list, JPanel orderPanel, final JPanel individualPanel, VideoRentalDA db) throws SQLException {
+	
+	orderPanel.removeAll();
+	individualPanel.removeAll();
+	orderButtons.clear();
+	customerOrders.clear();
+	orderItems.clear();
+	for(int i = 0; i < list.size(); i ++) {
+		
+		String buttonText = list.get(i).getDateOrdered();
+		buttonText += ", " + list.get(i).getStatus(); 
+		buttonText += ", " + list.get(i).getEmail();
+		buttonText += ", " + list.get(i).getOrderID();
+		
+		JButton button = new JButton(buttonText);
+		orderButtons.add(button);
+		customerOrders.add(list.get(i));
+		final int buttonIndex = i;
+		
+		
+		final ArrayList<OrderItem> innerList = db.getOrderItemsByOrderID(customerOrders.get(buttonIndex).getOrderID());
+		
+
+		button.addActionListener(new ActionListener() {
+	     
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+			
+						
+				
+						
+						for(int q = 0; q < innerList.size(); q++) {
+							
+							//Generate the list of order item labels
+							
+							String buttonText = innerList.get(q).getTitle();
+							buttonText += ", " + innerList.get(q).getYear();
+							buttonText += ", " + innerList.get(q).getPeriod();
+							buttonText += ", " + innerList.get(q).getQuantity();
+							buttonText += ", " + innerList.get(q).getOrderID();
+							
+							JLabel o = new JLabel(buttonText);
+							orderID = innerList.get(q).getOrderID(); 
+									
+							individualPanel.add(o);
+							
+						}
+						
+				
+			
+						
+						
+					
+						 CardLayout cl = (CardLayout)(cards.getLayout());
+						 cl.show(cards, ORDERINFOCARD);			
+				}
+	        });
+		
+		
+		orderPanel.add(button);
+		
+		
+		
+	}
+	
+	
+	
+}
+
+
+public int calculateLateFees(String date) throws ParseException {
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	LocalDate date1 = LocalDate.now();
+	LocalDate date2 = LocalDate.parse(date);
+
+    Period period = Period.between( date1, date2);
+    int diff = period.getDays();
+    System.out.println("diff = " + diff);
+//	long daysBetween = DAYS.between(date1, date2);
+//	
+//
+//	return daysBetween > 0 ? (int) (daysBetween * 3) : 0;
+	return diff;
+
+}
+
+
+
+
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the

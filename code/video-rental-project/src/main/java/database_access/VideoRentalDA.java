@@ -147,9 +147,6 @@ public int hasUnpaidOrder(String email) throws SQLException {
 }
 
 
-
-
-
 //Create a new order
 public void createCustomerOrder(String email) throws SQLException  {
 	try (
@@ -159,8 +156,8 @@ public void createCustomerOrder(String email) throws SQLException  {
 	 
 	         Statement stmt = conn.createStatement();
 	)  {
-		String date = "\"" + LocalDate.now().toString() +"\"";
-		String strSelect = "insert into customerOrders (dateOrdered, status, email) values ( " + date + ", \"UNPAID\", \'" + email + "\');";
+		String date = LocalDate.now().toString();
+		String strSelect = "insert into customerOrders (dateOrdered, status, email) values ( \'" + date + "\', \"UNPAID\", \'" + email + "\');";
 		stmt.executeUpdate(strSelect);
 	      
 	        conn.close();
@@ -213,8 +210,34 @@ public void removeOrder(int orderID) throws SQLException {
 }
 
 public ArrayList<CustomerOrder> getOrders(String email) throws SQLException {
-	return null;
-	//TODO
+	ArrayList<CustomerOrder> output = new ArrayList<CustomerOrder>();
+	try (
+	        Connection conn = DriverManager.getConnection(
+	              databaseURL,
+	              dbUserName, dbPassword);  
+
+	        Statement stmt = conn.createStatement();
+	)  {
+		String strSelect = "select * from customerOrders where email = \"" + email + "\" AND status <> \"UNPAID\";";
+
+		ResultSet rset = stmt.executeQuery(strSelect);
+		
+	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	    	 int orderID = rset.getInt("orderID");
+	    	 String dateOrdered = rset.getString("dateOrdered");
+	    	 String shippingDestination = null;
+	    	 int period = rset.getInt("period");
+	    	 String status = rset.getString("status");
+	    	 
+	    	 CustomerOrder n = new CustomerOrder(orderID, dateOrdered, null, period, status, null, email);
+	    	output.add(n);
+	     }
+	     
+	     conn.close();
+	}
+	
+return output;
+
 }
 
 public CustomerOrder getOrder(int orderID) throws SQLException {
@@ -246,7 +269,8 @@ public void removeOrderItem() throws SQLException {
 //TODO	
 }
 	
-	
+
+
 /*MANAGER related functions.-----------*/
 public void removeVideo(int videoID) throws SQLException {
 //TODO	
@@ -272,6 +296,40 @@ public ArrayList<Rating> getRatings(int videoID) throws SQLException{
 	return null;
 }	
 	
+
+public ArrayList<OrderItem> getOrderItemsByOrderID(int orderID) throws SQLException {
+	ArrayList<OrderItem> output = new ArrayList<OrderItem>();
+
+	try (
+	        Connection conn = DriverManager.getConnection(
+	              databaseURL,
+	              dbUserName, dbPassword);  
+
+	        Statement stmt = conn.createStatement();
+	)  {
+
+		String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.period, orderItems.videoID, orderItems.orderID, customerOrders.period, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID WHERE customerOrders.orderID = " + orderID + ";";
+		ResultSet rset = stmt.executeQuery(strSelect);
+		 int rowCount = 0;
+	     while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	        String email = rset.getString("email");
+	        int videoID = rset.getInt("videoID");
+	        int year = rset.getInt("year");
+	        String title = rset.getString("title");
+	        int quantity = rset.getInt("quantity");
+	        int period = rset.getInt("period");
+	        
+	        output.add(new OrderItem(title, year, quantity, orderID, videoID, period, email));
+	      
+	        ++rowCount;
+	     }
+	     
+	       conn.close();
+	   
+	}
+
+	return output;
+}
 
 public ArrayList<OrderItem> getCurrentOrderItemsByEmail(String email) throws SQLException {
 	
@@ -323,7 +381,7 @@ try (
         Statement stmt = conn.createStatement();
 )  {
 
-	String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.period, orderItems.videoID, orderItems.orderID, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID;";
+	String strSelect = "SELECT movies.title, movies.year, orderItems.quantity, orderItems.period, orderItems.videoID, orderItems.orderID, customerOrders.email FROM orderItems INNER JOIN movies ON orderItems.videoID = movies.videoID INNER JOIN customerOrders ON customerOrders.orderID = orderItems.orderID WHERE customerOrders.status = \"PAID\";";
 	ResultSet rset = stmt.executeQuery(strSelect);
 	 int rowCount = 0;
      while(rset.next()) {   // Move the cursor to the next row, return false if no more row
@@ -371,6 +429,28 @@ public void updateOrderStatus(int orderID) throws SQLException {
 	
 }
 
+public void updateOrderStatusShipped(int orderID) throws SQLException {
+	//TODO
+		try (
+		         Connection conn = DriverManager.getConnection(
+		               databaseURL,
+		               dbUserName, dbPassword);  
+		 
+		         Statement stmt = conn.createStatement();
+		)  {
+		
+			String strSelect = "update customerOrders set status = \"SHIPPED\" where orderID = " + orderID + ";";
+			stmt.executeUpdate(strSelect);
+		      
+		        conn.close();
+		    
+	}
+		
+		
+		
+	}
+
+
 /*---------------------------------------------------------------------------------------------*/	
 	
 	
@@ -383,8 +463,9 @@ public void addManager(String email, String password) throws SQLException {
 	 
 	         Statement stmt = conn.createStatement();
 	)  {
-	
-		String strSelect = "insert into managers values (" + "\"" + email + "\", " + "\"" + password + ");";
+		String strSelect = "insert into managers values (" + "\'" + email + "\', " + "\"" + password + "\");";
+		System.out.println(strSelect);
+
 		stmt.executeUpdate(strSelect);
 	      
 	        conn.close();
@@ -402,7 +483,7 @@ public void addCustomer(String email, String password) throws SQLException {
 	         Statement stmt = conn.createStatement();
 	)  {
 	
-		String strSelect = "insert into customers values (" + "\"" + email + "\", " + "\"" + password + "\", " + 0 + ", null)" + ";";
+		String strSelect = "insert into customers (email, password, loyaltypoints) values (" + "\"" + email + "\", " + "\"" + password + "\", " + 0 + ");";
 		stmt.executeUpdate(strSelect);
 	      
 	        conn.close();
