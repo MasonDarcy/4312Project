@@ -69,12 +69,12 @@ public class Login {
 		JPanel loginCard = new JPanel();
 
 		JButton loginButton = new JButton("login");
-		loginButton.setBounds(165, 144, 114, 26);
+		loginButton.setBounds(384, 182, 114, 26);
 		loginCard.setLayout(null);
 		loginCard.add(loginButton);
 
 		final JPanel galleryCard = new JPanel();
-		galleryCard.setBackground(Color.LIGHT_GRAY);
+		galleryCard.setBackground(Color.WHITE);
 
 		/* Create the panel that contains the "cards".------------------------- */
 		cards = new JPanel(new CardLayout());
@@ -83,60 +83,61 @@ public class Login {
 		cards.add(loginCard, LOGINPANEL);
 
 		emailField = new JTextField();
-		emailField.setBounds(165, 80, 114, 20);
+		emailField.setBounds(384, 112, 114, 20);
 		loginCard.add(emailField);
 		emailField.setColumns(10);
 
 		JLabel emailLabel = new JLabel("Enter email");
-		emailLabel.setBounds(89, 81, 76, 19);
+		emailLabel.setBounds(290, 113, 76, 19);
 		loginCard.add(emailLabel);
 
 		JLabel passwordLabel = new JLabel("Password:");
-		passwordLabel.setBounds(89, 112, 66, 20);
+		passwordLabel.setBounds(300, 144, 66, 20);
 		loginCard.add(passwordLabel);
 
 		passwordField = new JTextField();
-		passwordField.setBounds(165, 112, 114, 20);
+		passwordField.setBounds(384, 145, 114, 20);
 		loginCard.add(passwordField);
 		passwordField.setColumns(10);
 
 		JLabel titleLabel = new JLabel("Video Rental Service");
-		titleLabel.setBounds(12, 12, 160, 20);
+		titleLabel.setFont(new Font("Dialog", Font.BOLD, 26));
+		titleLabel.setBounds(290, 12, 318, 68);
 		loginCard.add(titleLabel);
 
 		JLabel lblLogin = new JLabel("Login");
-		lblLogin.setBounds(204, 57, 55, 16);
+		lblLogin.setBounds(409, 84, 55, 16);
 		loginCard.add(lblLogin);
 
 		JLabel lblNewLabel = new JLabel("Create Account");
-		lblNewLabel.setBounds(461, 57, 100, 16);
+		lblNewLabel.setBounds(384, 249, 100, 16);
 		loginCard.add(lblNewLabel);
 
 		JLabel lblNewLabel_1 = new JLabel("Enter Email:");
-		lblNewLabel_1.setBounds(374, 82, 76, 16);
+		lblNewLabel_1.setBounds(290, 279, 76, 16);
 		loginCard.add(lblNewLabel_1);
 
 		newEmailField = new JTextField();
-		newEmailField.setBounds(461, 80, 114, 20);
+		newEmailField.setBounds(384, 277, 114, 20);
 		loginCard.add(newEmailField);
 		newEmailField.setColumns(10);
 
 		newPasswordField = new JTextField();
-		newPasswordField.setBounds(461, 112, 114, 20);
+		newPasswordField.setBounds(384, 308, 114, 20);
 		loginCard.add(newPasswordField);
 		newPasswordField.setColumns(10);
 
 		JLabel lblNewLabel_2 = new JLabel("Password:");
-		lblNewLabel_2.setBounds(374, 114, 66, 16);
+		lblNewLabel_2.setBounds(300, 307, 66, 16);
 		loginCard.add(lblNewLabel_2);
 
 		JButton createAccountButton = new JButton("create account");
 
-		createAccountButton.setBounds(461, 144, 127, 26);
+		createAccountButton.setBounds(370, 340, 128, 26);
 		loginCard.add(createAccountButton);
 
 		final JRadioButton managerRadioButton = new JRadioButton("Manager");
-		managerRadioButton.setBounds(601, 78, 121, 24);
+		managerRadioButton.setBounds(518, 275, 121, 24);
 		loginCard.add(managerRadioButton);
 
 		managerRadioButton.addActionListener(new ActionListener() {
@@ -148,20 +149,22 @@ public class Login {
 		});
 
 		final JLabel successLabel = new JLabel("");
-		successLabel.setBounds(606, 149, 107, 16);
+		successLabel.setBounds(384, 378, 107, 16);
 		loginCard.add(successLabel);
 
 		final JLabel loginError = new JLabel("");
 		loginError.setFont(new Font("Dialog", Font.BOLD, 18));
-		loginError.setBounds(165, 220, 500, 33);
+		loginError.setBounds(192, 206, 500, 33);
 		loginError.setMinimumSize(new Dimension(500, 33));
 		loginCard.add(loginError);
+		
 
 		cards.add(galleryCard, TEXTPANEL);
 		galleryCard.setLayout(null);
 
 		JLabel galleryLabel = new JLabel("Gallery");
-		galleryLabel.setBounds(12, 12, 64, 16);
+		galleryLabel.setFont(new Font("Dialog", Font.BOLD, 25));
+		galleryLabel.setBounds(401, 12, 112, 55);
 		galleryCard.add(galleryLabel);
 
 		JLabel horrorLabel = new JLabel("Horror");
@@ -482,6 +485,13 @@ public class Login {
 		final JLabel orderError = new JLabel("");
 		orderError.setBounds(626, 420, 241, 46);
 		orderCard.add(orderError);
+		
+		JSeparator separator_3 = new JSeparator();
+		separator_3.setBackground(Color.BLACK);
+		separator_3.setForeground(Color.BLACK);
+		separator_3.setOrientation(SwingConstants.VERTICAL);
+		separator_3.setBounds(574, 77, 34, 374);
+		orderCard.add(separator_3);
 
 		JPanel individualOrderCard = new JPanel();
 		cards.add(individualOrderCard, ORDERINFOCARD);
@@ -567,6 +577,13 @@ public class Login {
 		JPanel updateMovieCard = new JPanel();
 		cards.add(updateMovieCard, UPDATECARD);
 		updateMovieCard.setLayout(null);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setOrientation(SwingConstants.VERTICAL);
+		separator_1.setForeground(Color.BLACK);
+		separator_1.setBackground(Color.BLACK);
+		separator_1.setBounds(321, 51, 26, 380);
+		updateMovieCard.add(separator_1);
 
 		JScrollPane movieScroll = new JScrollPane();
 		movieScroll.setBounds(623, 103, 259, 348);
@@ -578,7 +595,7 @@ public class Login {
 
 		JLabel lblAddVideo = new JLabel("Add Video");
 		lblAddVideo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblAddVideo.setBounds(108, 51, 99, 16);
+		lblAddVideo.setBounds(110, 72, 99, 16);
 		updateMovieCard.add(lblAddVideo);
 
 		JLabel lblStock = new JLabel("Stock");
@@ -602,7 +619,7 @@ public class Login {
 		lblIntroduction.setFont(new Font("Dialog", Font.BOLD, 16));
 
 		JLabel lblYear = new JLabel("Year");
-		lblYear.setBounds(45, 136, 34, 21);
+		lblYear.setBounds(45, 136, 44, 21);
 		updateMovieCard.add(lblYear);
 		lblYear.setFont(new Font("Dialog", Font.BOLD, 16));
 
@@ -666,7 +683,7 @@ public class Login {
 
 		JLabel lblEditVideo = new JLabel("Edit Video");
 		lblEditVideo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblEditVideo.setBounds(394, 52, 93, 16);
+		lblEditVideo.setBounds(394, 72, 93, 16);
 		updateMovieCard.add(lblEditVideo);
 
 		JLabel lblNewLabel_4 = new JLabel("videoID");
@@ -681,7 +698,7 @@ public class Login {
 
 		JLabel lblAttribute = new JLabel("Attribute");
 		lblAttribute.setFont(new Font("Dialog", Font.BOLD, 16));
-		lblAttribute.setBounds(358, 153, 80, 16);
+		lblAttribute.setBounds(342, 152, 80, 16);
 		updateMovieCard.add(lblAttribute);
 
 		editAttributeHolder = new JTextField();
@@ -799,6 +816,38 @@ public class Login {
 		final JLabel removeVideoLabel = new JLabel("");
 		removeVideoLabel.setBounds(405, 435, 200, 16);
 		updateMovieCard.add(removeVideoLabel);
+		
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setForeground(Color.BLACK);
+		separator_2.setBackground(Color.BLACK);
+		separator_2.setBounds(321, 311, 259, 5);
+		updateMovieCard.add(separator_2);
+		
+		JSeparator separator_1_1 = new JSeparator();
+		separator_1_1.setOrientation(SwingConstants.VERTICAL);
+		separator_1_1.setForeground(Color.BLACK);
+		separator_1_1.setBackground(Color.BLACK);
+		separator_1_1.setBounds(579, 51, 26, 380);
+		updateMovieCard.add(separator_1_1);
+		
+		JSeparator separator_2_1 = new JSeparator();
+		separator_2_1.setForeground(Color.BLACK);
+		separator_2_1.setBackground(Color.BLACK);
+		separator_2_1.setBounds(12, 51, 568, 2);
+		updateMovieCard.add(separator_2_1);
+		
+		JSeparator separator_2_1_1 = new JSeparator();
+		separator_2_1_1.setForeground(Color.BLACK);
+		separator_2_1_1.setBackground(Color.BLACK);
+		separator_2_1_1.setBounds(12, 430, 5659,10);
+		updateMovieCard.add(separator_2_1_1);
+		
+		JSeparator separator_1_2 = new JSeparator();
+		separator_1_2.setOrientation(SwingConstants.VERTICAL);
+		separator_1_2.setForeground(Color.BLACK);
+		separator_1_2.setBackground(Color.BLACK);
+		separator_1_2.setBounds(12, 51, 26, 380);
+		updateMovieCard.add(separator_1_2);
 		btnGetOrders.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -1350,7 +1399,7 @@ public class Login {
 		JFrame frmVideocoApplication = new JFrame("CardLayoutDemo");
 		frmVideocoApplication.setTitle("VideoCo Application");
 		frmVideocoApplication.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmVideocoApplication.setMinimumSize(new Dimension(950,500));
+		frmVideocoApplication.setMinimumSize(new Dimension(950,550));
 		// Create and set up the content pane.
 		Login demo = new Login();
 		demo.addComponentToPane(frmVideocoApplication.getContentPane());
