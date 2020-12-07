@@ -353,7 +353,7 @@ public class VideoRentalDA {
 	public void removeVideo(int videoID) throws SQLException {
 		try (Connection conn = DriverManager.getConnection(databaseURL, dbUserName, dbPassword);
 
-				Statement stmt = conn.createStatement();) {
+			Statement stmt = conn.createStatement();) {
 
 			String strSelect = "DELETE from movies where videoID = " + videoID + ";";
 			stmt.executeUpdate(strSelect);
@@ -362,9 +362,29 @@ public class VideoRentalDA {
 		}
 	}
 
-	public void addVideo(String title, int year, String introduction, String directors, String producers, int stock)
-			throws SQLException {
-//TODO	
+	public void addVideo(String title, int year, String category, String description, String directors, String producers, int stock) throws SQLException {
+		try (
+				Connection conn = DriverManager.getConnection(
+						databaseURL,
+						dbUserName, dbPassword)
+		)  {
+
+			String strSelect = "insert into movies (title, year, cat, introduction, directors, producers, stock) values (?,?,?,?,?,?,?)";
+			PreparedStatement preparedStatement = conn.prepareStatement(strSelect);
+
+			preparedStatement.setString(1, title);
+			preparedStatement.setInt(2, year);
+			preparedStatement.setString(3, category);
+			preparedStatement.setString(4, description);
+			preparedStatement.setString(5, directors);
+			preparedStatement.setString(6, producers);
+			preparedStatement.setInt(7,stock);
+
+			preparedStatement.executeUpdate();
+
+			conn.close();
+
+		}
 	}
 
 //Could have several of these for each attribute

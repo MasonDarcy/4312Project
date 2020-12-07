@@ -29,9 +29,9 @@ public class main {
 //		   System.out.println(testMovie.get(i).toString());
 //	   }
 	 //  dba.addCustomer("masonsemail", "masonsPassword"); 
-	    dba.returnOrders(32);
-	    //CustomerOrder c = new CustomerOrder(0, "2020-11-01", null, 20, null, null, null);
-	    //System.out.println(c.calculateLateFees());
+	    //dba.returnOrders(32);
+	    CustomerOrder c = new CustomerOrder(0, "1990-10-01", null, 20, null, null, null);
+	    System.out.println(c.calculateLateFees());
 	 
 	    }
 	

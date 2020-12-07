@@ -419,7 +419,9 @@ public class Login {
 		ButtonGroup group = new ButtonGroup();
 		group.add(loyaltyYesRadioBtn);
 		group.add(loyaltyNoRadioBtn);
+		
 
+		
 		loyaltyYesRadioBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				loyalty = true;
@@ -514,11 +516,11 @@ public class Login {
 		individualOrderCard.add(returnOrderButton);
 
 		JLabel returnOutputLabel = new JLabel("");
-		returnOutputLabel.setBounds(266, 346, 131, 21);
+		returnOutputLabel.setBounds(266, 346, 299, 21);
 		individualOrderCard.add(returnOutputLabel);
 
 		returnField = new JLabel("Return fee: ");
-		returnField.setBounds(280, 346, 83, 21);
+		returnField.setBounds(280, 346, 200, 21);
 		individualOrderCard.add(returnField);
 
 		JPanel shippingCard = new JPanel();
@@ -527,12 +529,12 @@ public class Login {
 
 		JButton btnGetOrders = new JButton("Get orders");
 
-		btnGetOrders.setBounds(110, 447, 98, 26);
+		btnGetOrders.setBounds(110, 383, 98, 26);
 		shippingCard.add(btnGetOrders);
 
 		JLabel lblGetOrders = new JLabel("Shipping List");
 		lblGetOrders.setFont(new Font("Dialog", Font.BOLD, 18));
-		lblGetOrders.setBounds(110, 81, 129, 26);
+		lblGetOrders.setBounds(110, 58, 129, 26);
 		shippingCard.add(lblGetOrders);
 
 		JLabel lblNewLabel_3 = new JLabel("Update To Delivered");
@@ -555,10 +557,11 @@ public class Login {
 		shippingCard.add(goToVideoUpdate);
 
 		JScrollPane shippingScroll = new JScrollPane();
-		shippingScroll.setBounds(110, 143, 273, 278);
+		shippingScroll.setBounds(110, 93, 273, 278);
 		shippingCard.add(shippingScroll);
 
 		final JPanel shippingPanel = new JPanel();
+		shippingPanel.setLayout(new BoxLayout(shippingPanel, BoxLayout.Y_AXIS));
 		shippingScroll.setViewportView(shippingPanel);
 
 		JPanel updateMovieCard = new JPanel();
@@ -569,26 +572,9 @@ public class Login {
 		movieScroll.setBounds(623, 103, 259, 348);
 		updateMovieCard.add(movieScroll);
 
-		JPanel moviePanel = new JPanel();
+		final JPanel moviePanel = new JPanel();
 		movieScroll.setViewportView(moviePanel);
 		moviePanel.setLayout(new BoxLayout(moviePanel, BoxLayout.Y_AXIS));
-		final JLabel lblNewLabel_5 = new JLabel("");
-		moviePanel.add(lblNewLabel_5);
-		
-		final JLabel lblNewLabel_6 = new JLabel("");
-		moviePanel.add(lblNewLabel_6);
-		
-		final JLabel lblNewLabel_7 = new JLabel("");
-		moviePanel.add(lblNewLabel_7);
-		
-		final JLabel lblNewLabel_8 = new JLabel("");
-		moviePanel.add(lblNewLabel_8);
-		
-		final JLabel lblNewLabel_9 = new JLabel("");
-		moviePanel.add(lblNewLabel_9);
-		
-		final JLabel lblNewLabel_10 = new JLabel("");
-		moviePanel.add(lblNewLabel_10);
 
 		JLabel lblAddVideo = new JLabel("Add Video");
 		lblAddVideo.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -656,26 +642,26 @@ public class Login {
 		addStockHolder.setColumns(10);
 
 		JButton addVideoButton = new JButton("Submit");
-		addVideoButton.setBounds(162, 317, 98, 26);
+		addVideoButton.setBounds(162, 359, 98, 26);
 		updateMovieCard.add(addVideoButton);
 
 		JLabel lblRemoveVideo = new JLabel("Remove Video");
 		lblRemoveVideo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblRemoveVideo.setBounds(117, 381, 114, 16);
+		lblRemoveVideo.setBounds(424, 328, 114, 16);
 		updateMovieCard.add(lblRemoveVideo);
 
 		JLabel lblVideoid = new JLabel("videoID");
 		lblVideoid.setFont(new Font("Dialog", Font.BOLD, 16));
-		lblVideoid.setBounds(45, 423, 80, 16);
+		lblVideoid.setBounds(342, 365, 80, 16);
 		updateMovieCard.add(lblVideoid);
 
 		removeVideoHolder = new JTextField();
-		removeVideoHolder.setBounds(162, 421, 114, 20);
+		removeVideoHolder.setBounds(424, 365, 114, 20);
 		updateMovieCard.add(removeVideoHolder);
 		removeVideoHolder.setColumns(10);
 
 		JButton removeVideoButton = new JButton("Submit");
-		removeVideoButton.setBounds(162, 452, 98, 26);
+		removeVideoButton.setBounds(424, 397, 98, 26);
 		updateMovieCard.add(removeVideoButton);
 
 		JLabel lblEditVideo = new JLabel("Edit Video");
@@ -743,28 +729,42 @@ public class Login {
 
 		toShippingButton.setBounds(768, 12, 114, 26);
 		updateMovieCard.add(toShippingButton);
-		
+
 		JButton managerVideoSearchButton = new JButton("Search");
 		managerVideoSearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					int id = Integer.parseInt(searchHolder.getText());
-					Movie m = dba.retrieveVideoInformationByID(id);
+					String title = (searchHolder.getText());
+					ArrayList<Movie> m = dba.getMoviesByTitle(title);
 					
-					lblNewLabel_5.setText("Title: " + m.getTitle());
-					lblNewLabel_6.setText("Year: " + m.getYear());
-					lblNewLabel_7.setText("Introduction: " + m.getIntroduction());
-					lblNewLabel_8.setText("Directors: " + m.getDirectors());
-					lblNewLabel_9.setText("Producers: " + m.getProducers());
-					lblNewLabel_10.setText("Stock: " + m.getStock());
+					moviePanel.removeAll();
+
+					for (int i = 0; i < m.size(); i++) {
+						JLabel temp0 = new JLabel("ID: " + m.get(i).getVideoID());
+						moviePanel.add(temp0);
+						JLabel temp1 = new JLabel("Title: " + m.get(i).getTitle());
+						moviePanel.add(temp1);
+						JLabel temp2 = new JLabel("Year: " + m.get(i).getYear());
+						moviePanel.add(temp2);
+						JLabel temp3 = new JLabel("Introduction: " + m.get(i).getIntroduction());
+						moviePanel.add(temp3);
+						JLabel temp4 = new JLabel("Directors: " + m.get(i).getDirectors());
+						moviePanel.add(temp4);
+						JLabel temp5 = new JLabel("Producers: " + m.get(i).getProducers());
+						moviePanel.add(temp5);
+						JLabel temp6 = new JLabel("Stock: " + m.get(i).getStock());
+						moviePanel.add(temp6);
+					}
 					
-				}catch(Exception e1) {
-					lblNewLabel_5.setText("Error, retry");
+					moviePanel.updateUI();
+
+				} catch (Exception e1) {
+					//searchLabel.setText("Error, retry");
 				}
-				
+
 			}
 		});
-		
+
 		editReturnLabel.setBounds(432, 300, 55, 16);
 		updateMovieCard.add(editReturnLabel);
 
@@ -775,11 +775,30 @@ public class Login {
 		searchHolder.setBounds(623, 75, 114, 20);
 		updateMovieCard.add(searchHolder);
 		final JLabel addVideoLabel = new JLabel("");
-		addVideoLabel.setBounds(162, 353, 300, 16);
+		addVideoLabel.setBounds(162, 35, 367, 76);
 		updateMovieCard.add(addVideoLabel);
 
 		searchHolder.setColumns(10);
 
+		JLabel lblCategory = new JLabel("Category");
+		lblCategory.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblCategory.setBounds(45, 311, 80, 21);
+		updateMovieCard.add(lblCategory);
+
+		JLabel lblTitle_1 = new JLabel("Title");
+		lblTitle_1.setFont(new Font("Dialog", Font.BOLD, 14));
+		lblTitle_1.setBounds(623, 51, 114, 16);
+		updateMovieCard.add(lblTitle_1);
+
+		final JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] { "Horror", "Comedy", "Sci-fi" }));
+		comboBox.setMaximumRowCount(3);
+		comboBox.setBounds(162, 311, 114, 25);
+		updateMovieCard.add(comboBox);
+
+		final JLabel removeVideoLabel = new JLabel("");
+		removeVideoLabel.setBounds(405, 435, 200, 16);
+		updateMovieCard.add(removeVideoLabel);
 		btnGetOrders.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -1032,9 +1051,9 @@ public class Login {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					dba.removeVideo(Integer.parseInt(removeVideoHolder.getText()));
+					removeVideoLabel.setText("Successfully removed");
 				} catch (NumberFormatException | SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					removeVideoLabel.setText("Error, unsuccessful");
 				}
 			}
 		});
@@ -1046,6 +1065,7 @@ public class Login {
 					String introduction = addIntroductionHolder.getText();
 					String directors = addDirectorsHolder.getText();
 					String producers = addProducersHolder.getText();
+					String category = (String) comboBox.getItemAt(comboBox.getSelectedIndex());
 					int stock = Integer.parseInt(addStockHolder.getText());
 					if (title.length() == 0 || introduction.length() == 0 || directors.length() == 0
 							|| producers.length() == 0) {
@@ -1053,7 +1073,7 @@ public class Login {
 						return;
 					}
 					try {
-						dba.addVideo(title, year, introduction, directors, producers, stock);
+						dba.addVideo(title, year, category, introduction, directors, producers, stock);
 						addVideoLabel.setText("Succesfully added");
 
 					} catch (SQLException e) {
@@ -1063,7 +1083,6 @@ public class Login {
 				} catch (Exception e) {
 					addVideoLabel.setText("Error, invalid value(s)");
 				}
-
 
 			}
 		});
@@ -1254,7 +1273,7 @@ public class Login {
 
 	}
 
-	private void populateCustomerOrders(ArrayList<CustomerOrder> list, JPanel orderPanel, final JPanel individualPanel,
+	private void populateCustomerOrders(final ArrayList<CustomerOrder> list, JPanel orderPanel, final JPanel individualPanel,
 			VideoRentalDA db) throws SQLException {
 
 		orderPanel.removeAll();
@@ -1281,7 +1300,17 @@ public class Login {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-
+					
+					int id = list.get(buttonIndex).getOrderID();
+					try {
+						returnFee = list.get(buttonIndex).calculateLateFees();
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					System.out.println("Clicked on: " + id);
+					
 					for (int q = 0; q < innerList.size(); q++) {
 
 						// Generate the list of order item labels
@@ -1293,18 +1322,8 @@ public class Login {
 						buttonText += ", " + innerList.get(q).getOrderID();
 
 						JLabel o = new JLabel(buttonText);
-						orderID = innerList.get(q).getOrderID();
-						System.out.println(orderID);
-						try {
-							returnFee = dba.getOrder(orderID).calculateLateFees();
-							System.out.println(returnFee);
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						int orderIDzz = innerList.get(q).getOrderID();
+	
 						individualPanel.add(o);
 
 					}
@@ -1331,7 +1350,7 @@ public class Login {
 		JFrame frmVideocoApplication = new JFrame("CardLayoutDemo");
 		frmVideocoApplication.setTitle("VideoCo Application");
 		frmVideocoApplication.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmVideocoApplication.setMinimumSize(new Dimension(1000, 600));
+		frmVideocoApplication.setMinimumSize(new Dimension(950,500));
 		// Create and set up the content pane.
 		Login demo = new Login();
 		demo.addComponentToPane(frmVideocoApplication.getContentPane());
